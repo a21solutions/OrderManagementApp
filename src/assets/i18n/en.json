@@ -1,0 +1,56 @@
+{
+  "APP": {
+    "TITLE": "AP Sales OMS",
+    "LANGUAGE": "Language"
+  },
+  "NAV": {
+    "PRODUCTS": "Products",
+    "ORDER_FORM": "Order Details",
+    "ORDER_SUMMARY": "Order Summary"
+  },
+  "PRODUCTS": {
+    "TITLE": "Select Products",
+    "SUBTITLE": "Choose your products and enter quantities",
+    "PRODUCT_NAME": "Product Name",
+    "QUANTITY": "Quantity",
+    "NO_PRODUCTS": "No products available",
+    "LOADING": "Loading products...",
+    "NEXT": "Next: Enter Details"
+  },
+  "ORDER_FORM": {
+    "TITLE": "Order Details",
+    "SUBTITLE": "Please provide your information",
+    "NAME": "Full Name",
+    "NAME_PLACEHOLDER": "Enter your name",
+    "MOBILE": "Mobile Number",
+    "MOBILE_PLACEHOLDER": "Enter 10-digit mobile number",
+    "ADDRESS": "Delivery Address",
+    "ADDRESS_PLACEHOLDER": "Enter complete delivery address",
+    "START_DATE": "Start Date",
+    "END_DATE": "End Date",
+    "BACK": "Back to Products",
+    "NEXT": "Review Order",
+    "REQUIRED": "This field is required",
+    "MOBILE_INVALID": "Please enter a valid 10-digit mobile number",
+    "DATE_RANGE_INVALID": "End date must be after start date"
+  },
+  "ORDER_SUMMARY": {
+    "TITLE": "Order Summary",
+    "SUBTITLE": "Please review your order before submitting",
+    "CUSTOMER_INFO": "Customer Information",
+    "ORDER_ITEMS": "Order Items",
+    "TOTAL_ITEMS": "Total Items",
+    "BACK": "Back to Edit",
+    "SUBMIT": "Submit Order",
+    "SUBMITTING": "Submitting...",
+    "SUCCESS": "Order submitted successfully!",
+    "ERROR": "Failed to submit order. Please try again.",
+    "NO_ITEMS": "No items in order"
+  },
+  "COMMON": {
+    "CLOSE": "Close",
+    "REFRESH": "Refresh",
+    "ERROR": "Error",
+    "SUCCESS": "Success"
+  }
+}

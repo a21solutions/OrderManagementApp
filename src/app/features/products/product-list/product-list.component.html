@@ -1,0 +1,133 @@
+<div class="product-list-container">
+  <div class="header">
+    <h1>{{ 'PRODUCTS.TITLE' | translate }}</h1>
+    <p class="subtitle">{{ 'PRODUCTS.SUBTITLE' | translate }}</p>
+  </div>
+
+  <!-- Use component's products array directly to avoid reference mismatch causing empty items -->
+  <div *ngIf="products && products.length >= 0; else loading">
+    <!-- Customer Details Form -->
+    <mat-card class="order-form-section">
+      <mat-card-content>
+        <h2>{{ 'ORDER_FORM.TITLE' | translate }}</h2>
+        <form [formGroup]="orderForm" class="customer-form">
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'ORDER_FORM.NAME' | translate }}</mat-label>
+              <input 
+                matInput 
+                formControlName="customerName"
+                [placeholder]="'ORDER_FORM.NAME_PLACEHOLDER' | translate">
+              <mat-icon matPrefix>person</mat-icon>
+              <mat-error *ngIf="orderForm.get('customerName')?.invalid">
+                {{ getErrorMessage('customerName') | translate }}
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'ORDER_FORM.MOBILE' | translate }}</mat-label>
+              <input 
+                matInput 
+                formControlName="phoneNumber"
+                type="tel"
+                maxlength="10"
+                [placeholder]="'ORDER_FORM.MOBILE_PLACEHOLDER' | translate">
+              <mat-icon matPrefix>phone</mat-icon>
+              <mat-error *ngIf="orderForm.get('phoneNumber')?.invalid">
+                {{ getErrorMessage('phoneNumber') | translate }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row full-width">
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'ORDER_FORM.ADDRESS' | translate }}</mat-label>
+              <textarea 
+                matInput 
+                formControlName="location"
+                rows="2"
+                [placeholder]="'ORDER_FORM.ADDRESS_PLACEHOLDER' | translate"></textarea>
+              <mat-icon matPrefix>location_on</mat-icon>
+              <mat-error *ngIf="orderForm.get('location')?.invalid">
+                {{ getErrorMessage('location') | translate }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'ORDER_FORM.START_DATE' | translate }}</mat-label>
+              <input 
+                matInput 
+                [matDatepicker]="startPicker"
+                formControlName="startDate"
+                [min]="minDate">
+              <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+              <mat-datepicker #startPicker></mat-datepicker>
+              <mat-error *ngIf="orderForm.get('startDate')?.invalid">
+                {{ getErrorMessage('startDate') | translate }}
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'ORDER_FORM.END_DATE' | translate }}</mat-label>
+              <input 
+                matInput 
+                [matDatepicker]="endPicker"
+                formControlName="endDate"
+                [min]="minDate">
+              <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+              <mat-datepicker #endPicker></mat-datepicker>
+              <mat-error *ngIf="orderForm.get('endDate')?.invalid || orderForm.hasError('dateRangeInvalid')">
+                {{ orderForm.hasError('dateRangeInvalid') ? ('ORDER_FORM.DATE_RANGE_INVALID' | translate) : (getErrorMessage('endDate') | translate) }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Products Section -->
+    <div class="products-section">
+      <h2>{{ 'PRODUCTS.SELECT_PRODUCTS' | translate }}</h2>
+      <div class="product-list">
+  <div *ngFor="let product of products" class="product-item">
+          <div class="product-name">
+            {{ getProductName(product) }}
+            <small *ngIf="languageService.getCurrentLanguage() === 'en'">{{ product.nameMr }}</small>
+            <small *ngIf="languageService.getCurrentLanguage() === 'mr'">{{ product.name }}</small>
+          </div>
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'PRODUCTS.QUANTITY' | translate }}</mat-label>
+            <input 
+              matInput 
+              type="number" 
+              min="0"
+              [value]="product.quantity || 0"
+              (change)="onQuantityChange(product, $any($event.target).value)"
+              (blur)="onQuantityChange(product, $any($event.target).value)">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div *ngIf="products.length === 0" class="no-products">
+        <p>{{ 'PRODUCTS.NO_PRODUCTS' | translate }}</p>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button 
+        mat-raised-button 
+        color="primary" 
+        (click)="proceedToReview()">
+        {{ 'ORDER_FORM.NEXT' | translate }}
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <ng-template #loading>
+    <app-loader></app-loader>
+  </ng-template>
+</div>

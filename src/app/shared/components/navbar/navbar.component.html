@@ -1,0 +1,16 @@
+<mat-toolbar color="primary" class="navbar">
+  <div class="navbar-container">
+    <h1 class="app-title">{{ 'APP.TITLE' | translate }}</h1>
+    
+    <div class="navbar-actions">
+      <button 
+        mat-raised-button 
+        color="accent" 
+        class="language-toggle"
+        (click)="toggleLanguage()">
+        <mat-icon>language</mat-icon>
+        <span class="language-label">{{ getCurrentLanguageLabel() }}</span>
+      </button>
+    </div>
+  </div>
+</mat-toolbar>
