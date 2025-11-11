@@ -1,0 +1,87 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isValidString(field, minLen) {
+      return field is string && field.size() >= minLen;
+    }
+
+    function isValidDateString(field) {
+      // Basic YYYY-MM-DD length check
+      return field is string && field.size() == 10;
+    }
+
+    function isNonNegativeNumber(n) {
+      return n is number && n >= 0;
+    }
+
+    function isValidStatus(s) {
+      return s in ['pending','completed','cancelled','confirmed','paid'];
+    }
+    
+    // Products collection - Read only for everyone
+    match /products/{productId} {
+      // Allow anyone to read products
+      allow read: if true;
+      
+      // Only allow authenticated users or admins to write
+      // Modify this based on your authentication requirements
+      allow write: if false; // Set to true or add auth conditions as needed
+    }
+    
+    // Orders collection - Create allowed, read optional, limited updates
+    match /orders/{orderId} {
+      // Allow anyone to create new orders with schema validation
+      allow create: if
+        isValidString(request.resource.data.customerName, 2) &&
+        isValidString(request.resource.data.phoneNumber, 0) &&
+        isValidString(request.resource.data.location, 5) &&
+        isValidDateString(request.resource.data.startDate) &&
+        isValidDateString(request.resource.data.endDate) &&
+        request.resource.data.days is number && request.resource.data.days >= 0 &&
+        request.resource.data.totalItems is number && request.resource.data.totalItems >= 0 &&
+        request.resource.data.items is list &&
+        request.resource.data.items.size() >= 0 && // allow empty items per requirement
+        request.resource.data.items.every(item,
+          item.productId is string &&
+          isValidString(item.productName, 1) &&
+          item.quantity is number && item.quantity >= 0 &&
+          isNonNegativeNumber(item.unitPrice) &&
+          isNonNegativeNumber(item.subtotal)
+        ) &&
+        request.resource.data.totals is map &&
+        isValidString(request.resource.data.totals.currency, 1) &&
+        isNonNegativeNumber(request.resource.data.totals.itemsTotal) &&
+        isNonNegativeNumber(request.resource.data.totals.discount) &&
+        isNonNegativeNumber(request.resource.data.totals.tax) &&
+        isNonNegativeNumber(request.resource.data.totals.shipping) &&
+        isNonNegativeNumber(request.resource.data.totals.grandTotal) &&
+        isValidStatus(request.resource.data.status) &&
+        request.resource.data.createdAt is timestamp &&
+        request.resource.data.updatedAt is timestamp;
+      
+      // Allow read for everyone (adjust as needed)
+      allow read: if true;
+      
+      // Allow status-only updates (pending -> completed or cancelled), and update timestamp
+      allow update: if
+        // only status and updatedAt can change
+        request.resource.data.diff(resource.data).changedKeys().hasOnly(['status','updatedAt']) &&
+        isValidStatus(request.resource.data.status) &&
+        request.resource.data.updatedAt is timestamp &&
+        // restrict transitions: only from pending to completed/cancelled or no-op
+        (
+          resource.data.status == request.resource.data.status ||
+          (resource.data.status == 'pending' && (request.resource.data.status == 'completed' || request.resource.data.status == 'cancelled'))
+        );
+
+      // Prevent deletes from clients
+      allow delete: if false;
+    }
+    
+    // Deny all other access by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

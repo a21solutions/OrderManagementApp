@@ -36,7 +36,10 @@ export interface Order {
   totals: OrderTotals;
 
   // Status and timestamps
-  status: 'pending' | 'confirmed' | 'paid' | 'fulfilled' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'paid' | 'completed' | 'cancelled';
   createdAt: Date;
   updatedAt: Date;
 }
+
+// Firestore document with id for listing/editing
+export type OrderWithId = Order & { id: string };

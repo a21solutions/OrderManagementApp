@@ -1,0 +1,116 @@
+<div class="order-summary-container">
+  <div class="header">
+    <h1>{{ 'ORDER_SUMMARY.TITLE' | translate }}</h1>
+    <p class="subtitle">{{ 'ORDER_SUMMARY.SUBTITLE' | translate }}</p>
+  </div>
+
+  <div class="summary-content" *ngIf="order">
+    <!-- Customer Information -->
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>person</mat-icon>
+          {{ 'ORDER_SUMMARY.CUSTOMER_INFO' | translate }}
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-item">
+            <strong>{{ 'ORDER_FORM.NAME' | translate }}:</strong>
+            <span>{{ order.customerName }}</span>
+          </div>
+          <div class="info-item">
+            <strong>{{ 'ORDER_FORM.MOBILE' | translate }}:</strong>
+            <span>{{ order.phoneNumber }}</span>
+          </div>
+          <div class="info-item full-width">
+            <strong>{{ 'ORDER_FORM.ADDRESS' | translate }}:</strong>
+            <span>{{ order.location }}</span>
+          </div>
+          <div class="info-item">
+            <strong>{{ 'ORDER_FORM.START_DATE' | translate }}:</strong>
+            <span>{{ formatDate(order.startDate) }}</span>
+          </div>
+          <div class="info-item">
+            <strong>{{ 'ORDER_FORM.END_DATE' | translate }}:</strong>
+            <span>{{ formatDate(order.endDate) }}</span>
+          </div>
+          <div class="info-item">
+            <strong>Days:</strong>
+            <span>{{ order.days }}</span>
+          </div>
+          <div class="info-item">
+            <strong>Status:</strong>
+            <span class="status-badge">{{ order.status }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Order Items -->
+    <mat-card class="items-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>shopping_cart</mat-icon>
+          {{ 'ORDER_SUMMARY.ORDER_ITEMS' | translate }}
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-list *ngIf="order.items.length > 0">
+          <mat-list-item *ngFor="let item of order.items; let last = last" class="product-item">
+            <div class="product-details">
+              <span class="product-name">{{ getProductName(item) }}</span>
+              <span class="product-quantity">
+                <mat-icon>numbers</mat-icon>
+                {{ item.quantity }}
+              </span>
+              <span class="product-subtotal" *ngIf="order.totals">
+                {{ (item.subtotal || 0) | number:'1.0-2' }} {{ order.totals.currency }}
+              </span>
+            </div>
+            <mat-divider *ngIf="!last"></mat-divider>
+          </mat-list-item>
+        </mat-list>
+
+        <div class="total-section" *ngIf="order.items.length > 0">
+          <mat-divider></mat-divider>
+          <div class="total-items">
+            <strong>{{ 'ORDER_SUMMARY.TOTAL_ITEMS' | translate }}:</strong>
+            <strong class="total-value">{{ order.totalItems }}</strong>
+          </div>
+          <div class="total-items" *ngIf="order.totals">
+            <span>Subtotal:</span>
+            <strong class="total-value">{{ order.totals.itemsTotal | number:'1.0-2' }} {{ order.totals.currency }}</strong>
+          </div>
+          <div class="total-items" *ngIf="order.totals">
+            <span>Total:</span>
+            <strong class="total-value">{{ order.totals.grandTotal | number:'1.0-2' }} {{ order.totals.currency }}</strong>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="action-buttons">
+    <button 
+      mat-raised-button 
+      color="accent"
+      class="back-button"
+      [disabled]="isSubmitting"
+      (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      {{ 'ORDER_SUMMARY.BACK' | translate }}
+    </button>
+
+    <button 
+      mat-raised-button 
+      color="primary"
+      class="submit-button"
+      [disabled]="isSubmitting"
+      (click)="submitOrder()">
+      <mat-icon *ngIf="!isSubmitting">check_circle</mat-icon>
+      <mat-icon *ngIf="isSubmitting" class="spinning">refresh</mat-icon>
+      {{ isSubmitting ? ('ORDER_SUMMARY.SUBMITTING' | translate) : ('ORDER_SUMMARY.SUBMIT' | translate) }}
+    </button>
+  </div>
+</div>

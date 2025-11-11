@@ -1,0 +1,89 @@
+<mat-card class="orders-container">
+  <mat-card-title>Orders</mat-card-title>
+  <mat-card-content>
+    <form [formGroup]="filterForm" class="filters">
+      <mat-form-field appearance="outline">
+        <mat-label>Name Filter</mat-label>
+        <input matInput formControlName="name" placeholder="Search by name" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Phone Filter</mat-label>
+        <input matInput formControlName="phone" placeholder="Search by phone" />
+      </mat-form-field>
+    </form>
+
+    <div class="table-wrapper" *ngIf="filteredOrders$ | async as orders; else loading">
+  <table mat-table [dataSource]="orders" class="mat-elevation-z1" [trackBy]="trackById">
+        <!-- Start Date -->
+        <ng-container matColumnDef="startDate">
+          <th mat-header-cell *matHeaderCellDef> Start Date </th>
+          <td mat-cell *matCellDef="let order"> {{ order.startDate }} </td>
+        </ng-container>
+
+        <!-- Customer Name -->
+        <ng-container matColumnDef="customerName">
+          <th mat-header-cell *matHeaderCellDef> Name </th>
+          <td mat-cell *matCellDef="let order"> {{ order.customerName }} </td>
+        </ng-container>
+
+        <!-- Phone -->
+        <ng-container matColumnDef="phoneNumber">
+          <th mat-header-cell *matHeaderCellDef> Phone </th>
+          <td mat-cell *matCellDef="let order"> {{ order.phoneNumber }} </td>
+        </ng-container>
+
+        <!-- Location -->
+        <ng-container matColumnDef="location">
+          <th mat-header-cell *matHeaderCellDef> Location </th>
+          <td mat-cell *matCellDef="let order"> {{ order.location }} </td>
+        </ng-container>
+
+        <!-- Items Preview -->
+        <ng-container matColumnDef="itemsPreview">
+          <th mat-header-cell *matHeaderCellDef> Products </th>
+          <td mat-cell *matCellDef="let order"> {{ getItemsPreview(order) }} </td>
+        </ng-container>
+
+        <!-- Total Items -->
+        <ng-container matColumnDef="totalItems">
+          <th mat-header-cell *matHeaderCellDef> Items </th>
+          <td mat-cell *matCellDef="let order"> {{ order.totalItems }} </td>
+        </ng-container>
+
+        <!-- Grand Total -->
+        <ng-container matColumnDef="grandTotal">
+          <th mat-header-cell *matHeaderCellDef> Total </th>
+          <td mat-cell *matCellDef="let order"> {{ getGrandTotal(order) | number:'1.2-2' }} </td>
+        </ng-container>
+
+        <!-- Status -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef> Status </th>
+          <td mat-cell *matCellDef="let order">
+            <span class="status" [class.pending]="order.status==='pending'" [class.completed]="order.status==='completed'" [class.cancelled]="order.status==='cancelled'">{{ order.status }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Actions -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef> Actions </th>
+          <td mat-cell *matCellDef="let order">
+            <button mat-icon-button color="primary" (click)="changeStatus(order,'completed')" [disabled]="saving[order.id] || order.status!=='pending'">
+              <mat-icon>check_circle</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="changeStatus(order,'cancelled')" [disabled]="saving[order.id] || order.status!=='pending'">
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+      <div *ngIf="orders.length === 0" class="empty">No orders found.</div>
+    </div>
+    <ng-template #loading>
+      <p>Loading orders...</p>
+    </ng-template>
+  </mat-card-content>
+</mat-card>

@@ -12,6 +12,11 @@ export const routes: Routes = [
     title: 'Products & Order Details'
   },
   {
+    path: 'orders',
+    loadComponent: () => import('./features/orders/orders-list/orders-list.component').then(m => m.OrdersListComponent),
+    title: 'Orders'
+  },
+  {
     path: '**',
     redirectTo: 'products'
   }

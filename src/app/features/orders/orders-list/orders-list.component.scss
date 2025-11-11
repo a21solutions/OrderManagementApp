@@ -1,0 +1,14 @@
+.orders-container { margin: 16px; }
+.filters { display: flex; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+.table-wrapper { overflow: auto; }
+.status { text-transform: capitalize; font-weight: 600; }
+.status.pending { color: #ff9800; }
+.status.completed { color: #2e7d32; }
+.status.cancelled { color: #c62828; }
+.expanded-row { background: #fafafa; }
+.items { display: grid; grid-template-columns: repeat(auto-fill,minmax(180px,1fr)); gap: 8px; margin-top: 8px; }
+.item { padding: 8px; border: 1px solid #e0e0e0; border-radius: 4px; background: #fff; display: flex; flex-direction: column; gap: 4px; }
+.item .name { font-weight: 500; }
+.item .qty { font-size: 12px; color: #555; }
+.item .subtotal { font-size: 12px; font-weight: 600; text-align: right; }
+.empty { padding: 12px; text-align: center; color: #666; }
