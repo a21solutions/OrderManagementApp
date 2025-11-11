@@ -4,6 +4,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, HttpClient } from '@angular/common/http';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
+import { provideAuth, getAuth } from '@angular/fire/auth';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { importProvidersFrom } from '@angular/core';
 
@@ -24,6 +25,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(),
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideFirestore(() => getFirestore()),
+  provideAuth(() => getAuth()),
     importProvidersFrom(
       TranslateModule.forRoot({
         defaultLanguage: 'en',

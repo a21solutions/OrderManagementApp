@@ -3,6 +3,18 @@
     <h1 class="app-title">{{ 'APP.TITLE' | translate }}</h1>
     
     <div class="navbar-actions">
+      <ng-container *ngIf="user$ | async as user; else loggedOut">
+        <a mat-button routerLink="/logout" class="logout-link">
+          <mat-icon>logout</mat-icon>
+          <span>Logout</span>
+        </a>
+      </ng-container>
+      <ng-template #loggedOut>
+        <button mat-button class="login-link" (click)="goToLogin()">
+          <mat-icon>login</mat-icon>
+          <span>Login</span>
+        </button>
+      </ng-template>
       <button 
         mat-raised-button 
         color="accent" 

@@ -6,6 +6,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { TranslateModule } from '@ngx-translate/core';
 import { LanguageService } from '../../../core/services/language.service';
+import { RouterModule, Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
@@ -16,13 +19,18 @@ import { LanguageService } from '../../../core/services/language.service';
     MatButtonModule,
     MatIconModule,
     MatMenuModule,
-    TranslateModule
+    TranslateModule,
+    RouterModule
   ],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent {
-  constructor(public languageService: LanguageService) {}
+  user$: Observable<any | null>;
+
+  constructor(public languageService: LanguageService, private auth: AuthService, private router: Router) {
+    this.user$ = this.auth.getCurrentUser();
+  }
 
   toggleLanguage(): void {
     this.languageService.toggleLanguage();
@@ -30,5 +38,10 @@ export class NavbarComponent {
 
   getCurrentLanguageLabel(): string {
     return this.languageService.getCurrentLanguage() === 'en' ? 'English' : 'मराठी';
+  }
+
+  goToLogin(): void {
+    const returnUrl = this.router.url;
+    this.router.navigate(['/login'], { queryParams: { returnUrl } });
   }
 }

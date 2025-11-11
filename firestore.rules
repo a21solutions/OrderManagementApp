@@ -18,6 +18,16 @@ service cloud.firestore {
     function isValidStatus(s) {
       return s in ['pending','completed','cancelled','confirmed','paid'];
     }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isSuperAdmin() {
+      // Check the caller's role from users collection
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin';
+    }
     
     // Products collection - Read only for everyone
     match /products/{productId} {
@@ -34,31 +44,15 @@ service cloud.firestore {
       // Allow anyone to create new orders with schema validation
       allow create: if
         isValidString(request.resource.data.customerName, 2) &&
-        isValidString(request.resource.data.phoneNumber, 0) &&
+        // Accept phone as string or number
+        (
+          (request.resource.data.phoneNumber is string && request.resource.data.phoneNumber.size() >= 0) ||
+          (request.resource.data.phoneNumber is number)
+        ) &&
         isValidString(request.resource.data.location, 5) &&
         isValidDateString(request.resource.data.startDate) &&
-        isValidDateString(request.resource.data.endDate) &&
-        request.resource.data.days is number && request.resource.data.days >= 0 &&
-        request.resource.data.totalItems is number && request.resource.data.totalItems >= 0 &&
-        request.resource.data.items is list &&
-        request.resource.data.items.size() >= 0 && // allow empty items per requirement
-        request.resource.data.items.every(item,
-          item.productId is string &&
-          isValidString(item.productName, 1) &&
-          item.quantity is number && item.quantity >= 0 &&
-          isNonNegativeNumber(item.unitPrice) &&
-          isNonNegativeNumber(item.subtotal)
-        ) &&
-        request.resource.data.totals is map &&
-        isValidString(request.resource.data.totals.currency, 1) &&
-        isNonNegativeNumber(request.resource.data.totals.itemsTotal) &&
-        isNonNegativeNumber(request.resource.data.totals.discount) &&
-        isNonNegativeNumber(request.resource.data.totals.tax) &&
-        isNonNegativeNumber(request.resource.data.totals.shipping) &&
-        isNonNegativeNumber(request.resource.data.totals.grandTotal) &&
-        isValidStatus(request.resource.data.status) &&
-        request.resource.data.createdAt is timestamp &&
-        request.resource.data.updatedAt is timestamp;
+        isValidDateString(request.resource.data.endDate) ;
+        
       
       // Allow read for everyone (adjust as needed)
       allow read: if true;
@@ -74,6 +68,22 @@ service cloud.firestore {
           resource.data.status == request.resource.data.status ||
           (resource.data.status == 'pending' && (request.resource.data.status == 'completed' || request.resource.data.status == 'cancelled'))
         );
+
+      // Prevent deletes from clients
+      allow delete: if false;
+    }
+
+    // Users collection - store user profiles and roles
+    match /users/{uid} {
+      // Read own profile; superadmin can read all
+      allow read: if isSignedIn() && (request.auth.uid == uid || isSuperAdmin());
+
+      // Create/update by superadmin only
+      allow create, update: if isSuperAdmin() &&
+        request.resource.data.keys().hasAll(['email','role','createdAt']) &&
+        isValidString(request.resource.data.email, 3) &&
+        request.resource.data.role in ['superadmin','admin','user','anonymous'] &&
+        request.resource.data.createdAt is timestamp;
 
       // Prevent deletes from clients
       allow delete: if false;
